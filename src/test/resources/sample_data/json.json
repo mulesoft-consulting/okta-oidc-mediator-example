@@ -1,0 +1,19 @@
+{
+  "grant_types": [
+    "client_credentials",
+    "authorization_code"
+  ],
+  "application_type": "web",
+  "redirect_uris": [
+    "omnis",
+    "quia"
+  ],
+  "client_name": "aut",
+  "response_types": [
+    "id_token",
+    "id_token"
+  ],
+  "": {
+    
+  }
+}

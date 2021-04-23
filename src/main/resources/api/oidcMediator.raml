@@ -1,0 +1,116 @@
+#%RAML 1.0
+title: Okta OIDC Mediator
+
+baseUri:
+
+types:
+  client: !include types/clientType.raml
+
+
+/.well-known/openid-configuration:
+    description: standard OIDC endpoint
+        
+    get: 
+      headers: 
+        accept:
+          type: string
+
+      responses: 
+        200:
+          body: 
+            application/json: 
+              example: !include examples/wellKnownOpenIDConfigurationExample.raml
+        400:
+          body: 
+            application/json: 
+              example: 
+                {"error": "some description of error"}
+
+/oauth2:
+  /{okta.authenticationServerId}/.well-known/openid-configuration:
+      description: standard OIDC endpoint
+      uriParameters: 
+        okta.authenticationServerId:
+          description: The name of the Okta Authentication Server
+          default: default    
+      get: 
+        headers: 
+          accept:
+            type: string
+  
+        responses: 
+          200:
+            body: 
+              application/json: 
+                example: !include examples/wellKnownOpenIDConfigurationExample.raml
+          400:
+            body: 
+              application/json: 
+                example: 
+                  {"error": "some description of error"}
+  /v1:
+    /clients:
+      post:
+        description: creates a client
+        headers: 
+          accept:
+          content-type:
+        body: 
+          application/json: 
+            example: !include examples/clientCreationRequestExample.raml
+            type: client
+
+        responses: 
+          201:
+            description: client has been created successfully
+            body: 
+              application/json: 
+                example: !include examples/clientCreationResponseExample.raml
+                          
+          400:
+            description: bad request - either bad JSON or trying to do something you can't do
+            body: 
+              application/json: 
+                          
+      /{clientId}:
+        uriParameters:
+          clientId:
+            description: identifies the client on which this action will be taken
+        put:
+          headers:  
+            accept:
+            content-type:
+          body:
+            application/json:
+              example: !include examples/clientUpdateRequestExample.raml
+              type: client
+
+          responses:
+            200:
+              body:
+                application/json:
+            400:
+              description: bad request - either bad JSON or trying to do something you can't do
+              body: 
+                application/json: 
+            401:
+              description: unauthorized
+              body: 
+                application/json: 
+
+        delete:
+          headers: 
+            accept:
+#            content-type:
+          responses:
+            204:
+            
+            400:
+              description: bad request - either bad JSON or trying to do something you can't do
+              body: 
+                application/json: 
+            401:
+              description: unauthorized
+              body: 
+                application/json: 
+          

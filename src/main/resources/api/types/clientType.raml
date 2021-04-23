@@ -1,0 +1,23 @@
+#%RAML 1.0 DataType
+  properties:
+    client_name:
+      type: string
+    redirect_uris:
+      type: string[]
+    response_types:
+      type: array
+      items:
+        enum: [code, token, id_token]
+    token_endpoint_auth_method?:
+      type: string
+      enum: [none, client_secret_post, client_secret_basic, client_secret_jwt,private_key_jwt]    
+      default: client_secret_basic
+    grant_types:
+      type: array
+      items:
+        enum: [refresh_token, authorization_code, password, implicit, client_credentials]
+    application_type?: 
+      type: string
+      default: web
+      enum:
+        - web

@@ -1,0 +1,102 @@
+{
+    "id": "a2839js02k",
+    "name": "oidc_client",
+    "label": "Sample Client",
+    "status": "ACTIVE",
+    "lastUpdated": "2020-01-09T16:59:15.000Z",
+    "created": "2020-01-09T16:59:15.000Z",
+    "accessibility": {
+        "selfService": false,
+        "errorRedirectUrl": null,
+        "loginRedirectUrl": null
+    },
+    "visibility": {
+        "autoSubmitToolbar": false,
+        "hide": {
+            "iOS": true,
+            "web": true
+        },
+        "appLinks": {
+            "oidc_client_link": true
+        }
+    },
+    "features": [],
+    "signOnMode": "OPENID_CONNECT",
+    "credentials": {
+        "userNameTemplate": {
+            "template": "${source.login}",
+            "type": "BUILT_IN"
+        },
+        "signing": {
+            "kid": "1se2f2-SzWqyKqwmfJ6qDk5g"
+        },
+        "oauthClient": {
+            "autoKeyRotation": true,
+            "client_id": "a2839js02k",
+            "client_secret": "29s8230k",
+            "token_endpoint_auth_method": "client_secret_post"
+        }
+    },
+    "settings": {
+        "app": {},
+        "notifications": {
+            "vpn": {
+                "network": {
+                    "connection": "DISABLED"
+                },
+                "message": null,
+                "helpUrl": null
+            }
+        },
+        "oauthClient": {
+            "client_uri": "http://localhost:8080",
+            "logo_uri": "http://developer.okta.com/assets/images/logo-new.png",
+            "redirect_uris": [
+                "https://example.com/oauth2/callback",
+                "myapp://callback"
+            ],
+            "post_logout_redirect_uris": [
+                "https://example.com/oauth2/postLogoutRedirectUri"
+            ],
+            "response_types": [
+                "token",
+                "id_token",
+                "code"
+            ],
+            "grant_types": [
+                "implicit",
+                "authorization_code"
+            ],
+            "application_type": "native",
+            "tos_uri": "https://example.com/client/tos",
+            "policy_uri": "https://example.com/client/policy",
+            "consent_method": "TRUSTED",
+            "issuer_mode": "CUSTOM_URL"
+        }
+    },
+    "_links": {
+        "appLinks": [
+            {
+                "name": "oidc_client_link",
+                "href": "https://${yourOktaDomain}/home/oidc_client/a2839js02k/aln5z7uhkbM6y7bMy0g7",
+                "type": "text/html"
+            }
+        ],
+        "groups": {
+            "href": "https://${yourOktaDomain}/api/v1/apps/a2839js02k/groups"
+        },
+        "logo": [
+            {
+                "name": "medium",
+                "href": "https://example.com/assets/img/logos/default.6770228fb0dab49a1695ef440a5279bb.png",
+                "type": "image/png"
+            }
+        ],
+        "users": {
+            "href": "https://${yourOktaDomain}/api/v1/apps/a2839js02k/users"
+        },
+        "deactivate": {
+            "href": "https://${yourOktaDomain}/api/v1/apps/a2839js02k/lifecycle/deactivate"
+        }
+    }
+}

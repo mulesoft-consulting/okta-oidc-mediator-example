@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd 
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+
+	<sub-flow name="deleteClientInOkta"
+		doc:id="fb17d77f-facd-4724-ad13-264c1fc61912">
+		<try doc:name="Try" doc:id="acc00674-7c79-48f5-b0f2-7c65e8e1ad13" >
+			<http:request method="DELETE" doc:name="Delete Client in Okta" doc:id="60e4a2ef-363f-441e-8ee6-6b2a61667531" config-ref="Okta_Requester_Config" path="/oauth2/v1/clients/{clientId}" sendCorrelationId="NEVER" sendBodyMode="ALWAYS" requestStreamingMode="NEVER">
+			<http:headers><![CDATA[#[output application/java
+---
+{
+	"authorization" : p('okta.authorization.header'),
+	"accept" : "application/json",
+	"content-type" : "application/json"
+}]]]></http:headers>
+			<http:uri-params><![CDATA[#[output application/java
+---
+{
+	clientId : attributes.uriParams.clientId
+}]]]></http:uri-params>
+			<http:response-validator>
+				<http:success-status-code-validator values="200..299" />
+			</http:response-validator>
+		</http:request>
+			<logger level="INFO" message="delete:\oauth2\v1\clients\(clientID):oidcMediator-config" />
+						<error-handler>
+				<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="f4c73a8a-0fe0-4788-94fd-79584edac319">
+					<flow-ref doc:name="prepareError" doc:id="4f8a5ecd-259e-43a7-ad3d-b2841a3996fe" name="prepareError" />
+				</on-error-continue>
+			</error-handler>
+		</try>
+	</sub-flow>
+	<sub-flow name="buildWellKnownOpenIdConfig" doc:id="57ddaca3-e255-48b9-a1a5-443e63cafb8b" >
+		<try doc:name="Try" doc:id="4ce8600c-106f-4d05-a0cd-fe19f3ccff7d">
+			<ee:transform doc:name="Build Well-Known Response" doc:id="5cc8e2dc-dc2d-4bf6-9f39-87f64a905790">
+					<ee:message>
+						<ee:set-payload resource="mappings/well-known-oidc.dwl" />
+					</ee:message> 
+				</ee:transform>
+			<error-handler>
+				<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="94a5932d-70a4-4e3a-b60b-abadbef4d477">
+					<set-variable value="500" doc:name="http status" doc:id="bc3ec081-f97e-45f7-80dd-952904c30a7d" variableName="httpStatus" />
+					<ee:transform doc:name="error message" doc:id="5b32bce9-c386-47e5-a5d3-27dc60266ef3">
+						<ee:message>
+							<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+error]]></ee:set-payload>
+						</ee:message>
+					</ee:transform>
+				</on-error-continue>
+			</error-handler>
+		</try>
+	</sub-flow>
+	<sub-flow name="updateClientInOkta" doc:id="40537806-da27-4505-88e4-d5d50c848ad8" >
+		<try doc:name="Try" doc:id="6df217dd-b5a9-4c04-8ecc-ccb7425b5a36" doc:description="Client Secret is not returned in the get:/clients/{clientId} response from Okta.  It is returned on creation or update.  Pushing an update, then comparing secrets to determine if a reset is required.">
+	 <http:request method="GET" doc:name="Get Current Client Info From Okta" doc:id="bce694eb-ef61-4981-b0da-bcd989e89736" config-ref="Okta_Requester_Config" path="/oauth2/v1/clients/{clientId}" sendCorrelationId="NEVER" sendBodyMode="NEVER" requestStreamingMode="NEVER" target="currentAppData">
+			<http:headers><![CDATA[#[output application/java
+---
+{
+	"authorization" : p('okta.authorization.header'),
+	"accept" : "application/json",
+	"content-type" : "application/json"
+}]]]></http:headers>
+			<http:uri-params><![CDATA[#[output application/java
+---
+{
+	clientId : attributes.uriParams.clientId
+}]]]></http:uri-params>
+			<http:response-validator>
+				<http:success-status-code-validator values="200" />
+			</http:response-validator>
+		</http:request>
+			<ee:transform doc:name="Build Full Update Body" doc:id="238542dc-99a5-447a-b0d7-daf2571dd4d0">
+				<ee:message>
+					<ee:set-payload resource="fullClientUpdate.dwl" />
+				</ee:message>
+				<ee:variables>
+					<ee:set-variable variableName="inboundClientSecret"><![CDATA[%dw 2.0
+output application/java
+---
+payload.client_secret]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<http:request method="PUT" doc:name="Update Okta Client" doc:id="817d6ed5-c496-419b-8397-0741d2078503" config-ref="Okta_Requester_Config" path="/oauth2/v1/clients/{clientId}">
+				<http:headers><![CDATA[#[output application/java
+---
+{
+	"authorization" : p('okta.authorization.header'),
+	"accept" : "application/json",
+	"content-type" : "application/json"
+}]]]></http:headers>
+				<http:uri-params><![CDATA[#[output application/java
+---
+{
+	clientId : attributes.uriParams.clientId
+}]]]></http:uri-params>
+				<http:response-validator>
+					<http:success-status-code-validator values="200..299" />
+				</http:response-validator>
+			</http:request>
+			<choice doc:name="Choice" doc:id="d4b8a2fb-82c4-465b-82c1-5e8fb253bac5">
+				<when expression="#[payload.client_secret != vars.inboundClientSecret]">
+					<http:request method="POST" doc:name="Reset Client Secret" doc:id="8cb89d7e-876b-41b6-ba6e-eb334adc92fa" config-ref="Okta_Requester_Config" path="/oauth2/v1/clients/{clientId}/lifecycle/newSecret">
+						<http:headers><![CDATA[#[output application/java
+---
+{
+	"authorization" : p('okta.authorization.header'),
+	"accept" : "application/json",
+	"content-type" : "application/json"
+}]]]></http:headers>
+						<http:uri-params><![CDATA[#[output application/java
+---
+{
+	clientId : payload.client_id
+}]]]></http:uri-params>
+						<http:response-validator>
+							<http:success-status-code-validator values="200..299" />
+						</http:response-validator>
+					</http:request>
+				</when>
+				<otherwise>
+					<logger level="INFO" doc:name="Bypass Client Secret" doc:id="83777bbf-0151-422e-968f-907ca521752f" message="Update did not require client secret reset" />
+				</otherwise>
+			</choice>
+			<error-handler>
+				<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="c82babe9-3d61-4a37-9fa4-770342c6a31e">
+					<flow-ref doc:name="prepareError" doc:id="bab0f136-9319-4bcc-8e93-4cc7a60ed5f7" name="prepareError" />
+				</on-error-continue>
+			</error-handler>
+		</try>
+	</sub-flow>
+	<sub-flow name="createClientInOkta" doc:id="7d7ed7ef-4ea6-4ef7-8b4c-37d82cd008be" >
+		<try doc:name="Try" doc:id="0a81ae46-a016-4778-8d96-58ad8d727e16">
+			<ee:transform doc:name="Create Client Body" doc:id="be56698d-1cef-4533-afac-818f59be6130">
+					<ee:message>
+					<ee:set-payload resource="createClient.dwl" />
+					</ee:message>
+				</ee:transform>
+			<http:request method="POST" doc:name="Create Client In Okta" doc:id="52985b7b-029d-4efa-a77b-3bfa0092f064" config-ref="Okta_Requester_Config" sendCorrelationId="NEVER" sendBodyMode="ALWAYS" requestStreamingMode="NEVER" path="/oauth2/v1/clients">
+						<http:headers><![CDATA[#[output application/java
+---
+{
+	"authorization" : p('okta.authorization.header'),
+	"accept" : "application/json",
+	"content-type" : "application/json"
+}]]]></http:headers>
+						<http:response-validator>
+							<http:success-status-code-validator values="201,200" />
+						</http:response-validator>
+					</http:request>
+			<error-handler>
+						<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="33b5f284-70ee-48db-8462-0d675d9e55ca">
+							<flow-ref doc:name="prepareError" doc:id="7e7d7eb0-37ec-4672-89db-d820fe8d9adf" name="prepareError" />
+						</on-error-continue>
+					</error-handler>
+				</try>
+	</sub-flow>
+	<sub-flow name="prepareError" doc:id="569a9985-cf2f-4a08-8b5c-c0893ce90359">
+		<set-variable value="#[error.muleMessage.typedAttributes.statusCode default (500 as Number)]"
+			doc:name="httpStatus from error object" doc:id="ad671753-a949-46f0-8ef7-0791457d98ee"
+			variableName="httpStatus" />
+		<set-payload value="#[error.errorMessage.payload default '{&quot;error&quot;: &quot;system error - check logs&quot;}']"
+			doc:name="payload is original Okta response" doc:id="f1ab45f7-f4a9-4417-8b59-3b274c710344" />
+		<logger level="INFO" doc:name="Logger" doc:id="8f926b4b-0e93-44e6-808b-4d918914ae0d" message="#[payload]"/>
+		<ee:transform doc:name="make JSON payload" doc:id="344a706f-ac25-41da-8346-2babc1c19b34" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>	
+	
+
+	</mule>

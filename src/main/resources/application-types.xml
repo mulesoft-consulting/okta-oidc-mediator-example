@@ -1,0 +1,214 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="oktaCreateAppRequest" format="json">
+      <types:shape format="weave" example="json/oktaCreateAppRequest.json"><![CDATA[%dw 2.0
+
+type oktaCreateAppRequest = {|
+  name: String, 
+  label: String, 
+  signOnMode: String, 
+  credentials: {|
+    oauthClient: {|
+      autoKeyRotation: Boolean, 
+      token_endpoint_auth_method: String
+    |}
+  |}, 
+  settings: {|
+    oauthClient: {|
+      client_uri: String, 
+      logo_uri: String, 
+      redirect_uris: Array<String>, 
+      post_logout_redirect_uris: Array<String>, 
+      response_types: Array<String>, 
+      grant_types: Array<String>, 
+      application_type: String, 
+      tos_uri: String, 
+      policy_uri: String
+    |}
+  |}
+|} {"example": "{\\\"name\\\":\\\"oidc_client\\\",\\\"label\\\":\\\"Sample Client\\\",\\\"signOnMode\\\":\\\"OPENID_CONNECT\\\",\\\"credentials\\\":{\\\"oauthClient\\\":{\\\"autoKeyRotation\\\":true,\\\"token_endpoint_auth_method\\\":\\\"client_secret_post\\\"}},\\\"settings\\\":{\\\"oauthClient\\\":{\\\"client_uri\\\":\\\"http:\\/\\/localhost:8080\\\",\\\"logo_uri\\\":\\\"http:\\/\\/developer.okta.com\\/assets\\/images\\/logo-new.png\\\",\\\"redirect_uris\\\":[\\\"https:\\/\\/example.com\\/oauth2\\/callback\\\",\\\"myapp:\\/\\/callback\\\"],\\\"post_logout_redirect_uris\\\":[\\\"https:\\/\\/example.com\\/oauth2\\/postLogoutRedirectUri\\\"],\\\"response_types\\\":[\\\"token\\\",\\\"id_token\\\",\\\"code\\\"],\\\"grant_types\\\":[\\\"implicit\\\",\\\"authorization_code\\\"],\\\"application_type\\\":\\\"native\\\",\\\"tos_uri\\\":\\\"https:\\/\\/example.com\\/client\\/tos\\\",\\\"policy_uri\\\":\\\"https:\\/\\/example.com\\/client\\/policy\\\"}}}"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="oktaAppResponse" format="json">
+      <types:shape format="weave" example="json/oktaAppResponseExample.json"><![CDATA[%dw 2.0
+
+type oktaAppResponse = {|
+  id: String, 
+  name: String, 
+  label: String, 
+  status: String, 
+  lastUpdated: String, 
+  created: String, 
+  accessibility: {|
+    selfService: Boolean, 
+    errorRedirectUrl: Null, 
+    loginRedirectUrl: Null
+  |}, 
+  visibility: {|
+    autoSubmitToolbar: Boolean, 
+    hide: {|
+      iOS: Boolean, 
+      web: Boolean
+    |}, 
+    appLinks: {| oidc_client_link: Boolean |}
+  |}, 
+  features: Array<Any>, 
+  signOnMode: String, 
+  credentials: {|
+    userNameTemplate: {|
+      template: String, 
+      "type": String
+    |}, 
+    signing: {| kid: String |}, 
+    oauthClient: {|
+      autoKeyRotation: Boolean, 
+      client_id: String, 
+      client_secret: String, 
+      token_endpoint_auth_method: String
+    |}
+  |}, 
+  settings: {|
+    app: {|  |}, 
+    notifications: {|
+      vpn: {|
+        network: {| connection: String |}, 
+        message: Null, 
+        helpUrl: Null
+      |}
+    |}, 
+    oauthClient: {|
+      client_uri: String, 
+      logo_uri: String, 
+      redirect_uris: Array<String>, 
+      post_logout_redirect_uris: Array<String>, 
+      response_types: Array<String>, 
+      grant_types: Array<String>, 
+      application_type: String, 
+      tos_uri: String, 
+      policy_uri: String, 
+      consent_method: String, 
+      issuer_mode: String
+    |}
+  |}, 
+  "_links": {|
+    appLinks: Array<{|      name: String,       href: String,       "type": String    |}>, 
+    groups: {| href: String |}, 
+    logo: Array<{|      name: String,       href: String,       "type": String    |}>, 
+    users: {| href: String |}, 
+    deactivate: {| href: String |}
+  |}
+|} {"example": "{\\\"id\\\":\\\"0oap6nz61rKdsoyOY0h7\\\",\\\"name\\\":\\\"oidc_client\\\",\\\"label\\\":\\\"Sample Client\\\",\\\"status\\\":\\\"ACTIVE\\\",\\\"lastUpdated\\\":\\\"2020-01-09T16:59:15.000Z\\\",\\\"created\\\":\\\"2020-01-09T16:59:15.000Z\\\",\\\"accessibility\\\":{\\\"selfService\\\":false,\\\"errorRedirectUrl\\\":null,\\\"loginRedirectUrl\\\":null},\\\"visibility\\\":{\\\"autoSubmitToolbar\\\":false,\\\"hide\\\":{\\\"iOS\\\":true,\\\"web\\\":true},\\\"appLinks\\\":{\\\"oidc_client_link\\\":true}},\\\"features\\\":[],\\\"signOnMode\\\":\\\"OPENID_CONNECT\\\",\\\"credentials\\\":{\\\"userNameTemplate\\\":{\\\"template\\\":\\\"\${source.login}\\\",\\\"type\\\":\\\"BUILT_IN\\\"},\\\"signing\\\":{\\\"kid\\\":\\\"5gbe0HpzAYj2rsWSLxx1fYHdh-SzWqyKqwmfJ6qDk5g\\\"},\\\"oauthClient\\\":{\\\"autoKeyRotation\\\":true,\\\"client_id\\\":\\\"0oap6nz61rKdsoyOY0h7\\\",\\\"client_secret\\\":\\\"D0HxBn1FtTXeYC4cSBwWL_sPMztMT2t6Ei9n1QjO\\\",\\\"token_endpoint_auth_method\\\":\\\"client_secret_post\\\"}},\\\"settings\\\":{\\\"app\\\":{},\\\"notifications\\\":{\\\"vpn\\\":{\\\"network\\\":{\\\"connection\\\":\\\"DISABLED\\\"},\\\"message\\\":null,\\\"helpUrl\\\":null}},\\\"oauthClient\\\":{\\\"client_uri\\\":\\\"http:\\/\\/localhost:8080\\\",\\\"logo_uri\\\":\\\"http:\\/\\/developer.okta.com\\/assets\\/images\\/logo-new.png\\\",\\\"redirect_uris\\\":[\\\"https:\\/\\/example.com\\/oauth2\\/callback\\\",\\\"myapp:\\/\\/callback\\\"],\\\"post_logout_redirect_uris\\\":[\\\"https:\\/\\/example.com\\/oauth2\\/postLogoutRedirectUri\\\"],\\\"response_types\\\":[\\\"token\\\",\\\"id_token\\\",\\\"code\\\"],\\\"grant_types\\\":[\\\"implicit\\\",\\\"authorization_code\\\"],\\\"application_type\\\":\\\"native\\\",\\\"tos_uri\\\":\\\"https:\\/\\/example.com\\/client\\/tos\\\",\\\"policy_uri\\\":\\\"https:\\/\\/example.com\\/client\\/policy\\\",\\\"consent_method\\\":\\\"TRUSTED\\\",\\\"issuer_mode\\\":\\\"CUSTOM_URL\\\"}},\\\"_links\\\":{\\\"appLinks\\\":[{\\\"name\\\":\\\"oidc_client_link\\\",\\\"href\\\":\\\"https:\\/\\/\${yourOktaDomain}\\/home\\/oidc_client\\/0oap6nz61rKdsoyOY0h7\\/aln5z7uhkbM6y7bMy0g7\\\",\\\"type\\\":\\\"text\\/html\\\"}],\\\"groups\\\":{\\\"href\\\":\\\"https:\\/\\/\${yourOktaDomain}\\/api\\/v1\\/apps\\/0oap6nz61rKdsoyOY0h7\\/groups\\\"},\\\"logo\\\":[{\\\"name\\\":\\\"medium\\\",\\\"href\\\":\\\"https:\\/\\/example.com\\/assets\\/img\\/logos\\/default.6770228fb0dab49a1695ef440a5279bb.png\\\",\\\"type\\\":\\\"image\\/png\\\"}],\\\"users\\\":{\\\"href\\\":\\\"https:\\/\\/\${yourOktaDomain}\\/api\\/v1\\/apps\\/0oap6nz61rKdsoyOY0h7\\/users\\\"},\\\"deactivate\\\":{\\\"href\\\":\\\"https:\\/\\/\${yourOktaDomain}\\/api\\/v1\\/apps\\/0oap6nz61rKdsoyOY0h7\\/lifecycle\\/deactivate\\\"}}}"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="clientResponseExample" format="json">
+      <types:shape format="weave" example="json/clientResponseExample.json"><![CDATA[%dw 2.0
+
+type clientResponseExample = {|
+  client_id: String, 
+  client_secret: String, 
+  client_id_issued_at: Number {"typeId": "int"}, 
+  client_secret_expires_at: Number {"typeId": "int"}, 
+  client_name: String, 
+  client_uri: Null, 
+  logo_uri: Null, 
+  redirect_uris: Array<String>, 
+  response_types: Array<String>, 
+  grant_types: Array<String>, 
+  token_endpoint_auth_method: String, 
+  application_type: String
+|} {"example": "{\\\"client_id\\\":\\\"0oav21aq5wbmjaTyG0h7\\\",\\\"client_secret\\\":\\\"SRcwr-lWZ-PExoxGhpZgOigBo5K4_Agcywy3wrXW\\\",\\\"client_id_issued_at\\\":1605130452,\\\"client_secret_expires_at\\\":0,\\\"client_name\\\":\\\"Hello Client\\\",\\\"client_uri\\\":null,\\\"logo_uri\\\":null,\\\"redirect_uris\\\":[\\\"http:\\/\\/csportal.internal.com\\/api\\\"],\\\"response_types\\\":[\\\"code\\\"],\\\"grant_types\\\":[\\\"authorization_code\\\",\\\"client_credentials\\\"],\\\"token_endpoint_auth_method\\\":\\\"client_secret_basic\\\",\\\"application_type\\\":\\\"web\\\"}"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="oktaClientResponse" format="json">
+      <types:shape format="weave" example="json/oktaClientResponseExample.json"><![CDATA[%dw 2.0
+
+type oktaClientResponse = {|
+  client_id: String, 
+  client_secret: String, 
+  client_id_issued_at: Number {"typeId": "int"}, 
+  client_secret_expires_at: Number {"typeId": "int"}, 
+  client_name: String, 
+  client_uri: String, 
+  logo_uri: String, 
+  application_type: String, 
+  redirect_uris: Array<String>, 
+  post_logout_redirect_uris: Array<String>, 
+  response_types: Array<String>, 
+  grant_types: Array<String>, 
+  token_endpoint_auth_method: String, 
+  initiate_login_uri: String
+|} {"example": "{\\\"client_id\\\":\\\"0jrabyQWm4B9zVJPbotY\\\",\\\"client_secret\\\":\\\"5W7XULCEs4BJKnWUXwh8lgmeXRhcGcdViFp84pWe\\\",\\\"client_id_issued_at\\\":1453913425,\\\"client_secret_expires_at\\\":0,\\\"client_name\\\":\\\"Example OAuth Client\\\",\\\"client_uri\\\":\\\"https:\\/\\/www.example-application.com\\\",\\\"logo_uri\\\":\\\"https:\\/\\/www.example-application.com\\/logo.png\\\",\\\"application_type\\\":\\\"web\\\",\\\"redirect_uris\\\":[\\\"https:\\/\\/www.example-application.com\\/oauth2\\/redirectUri\\\"],\\\"post_logout_redirect_uris\\\":[\\\"https:\\/\\/www.example-application.com\\/oauth2\\/postLogoutRedirectUri\\\"],\\\"response_types\\\":[\\\"id_token\\\",\\\"code\\\"],\\\"grant_types\\\":[\\\"authorization_code\\\"],\\\"token_endpoint_auth_method\\\":\\\"client_secret_post\\\",\\\"initiate_login_uri\\\":\\\"https:\\/\\/www.example-application.com\\/oauth2\\/login\\\"}"}
+
+]]></types:shape>
+    </types:type>
+  </types:catalog>
+  <types:enrichment select="#be56698d-1cef-4533-afac-818f59be6130">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="clientResponseExample"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#52985b7b-029d-4efa-a77b-3bfa0092f064">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="clientResponseExample"/>
+        </types:message>
+      </types:input-event>
+      <types:output-event>
+        <types:message>
+          <types:payload type="clientResponseExample"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#bce694eb-ef61-4981-b0da-bcd989e89736">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="clientResponseExample"/>
+        </types:message>
+      </types:input-event>
+      <types:output-event>
+        <types:variables>
+          <types:variable name="currentAppData" type="oktaClientResponse"/>
+        </types:variables>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#238542dc-99a5-447a-b0d7-daf2571dd4d0">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="clientResponseExample"/>
+        </types:message>
+      </types:input-event>
+      <types:output-event>
+        <types:message>
+          <types:payload type="oktaClientResponse"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#e70e3c64-180f-4626-805c-a9a3417623b6">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="clientResponseExample"/>
+        </types:message>
+      </types:input-event>
+      <types:output-event>
+        <types:message>
+          <types:payload type="oktaClientResponse"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+</types:mule>
